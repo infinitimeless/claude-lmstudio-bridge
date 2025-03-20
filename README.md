@@ -1,37 +1,30 @@
 # Claude-LMStudio Bridge
 
-An MCP server that bridges Claude with local LLMs running in LM Studio. This bridge allows Claude to interact with your local language models.
+An MCP server that bridges Claude with local LLMs running in LM Studio.
 
-## 🚀 Quick Setup
+## ⚠️ Important Setup Step Required
 
-For the **easiest setup** that ensures the bridge works with Claude Desktop:
+Before using this bridge, you **must** configure the Python path in the wrapper scripts:
 
-### On macOS/Linux:
-```bash
-# Clone the repository
-git clone https://github.com/infinitimeless/claude-lmstudio-bridge.git
-cd claude-lmstudio-bridge
+### For macOS/Linux Users:
+1. Find your Python path by running `which python3` in Terminal
+2. Edit `run_server.sh` and update the `PYTHON_PATH` variable with your path:
+   ```bash
+   # Change this to your actual Python path!
+   PYTHON_PATH="/usr/local/bin/python3"
+   ```
+3. Make the wrapper executable:
+   ```bash
+   chmod +x run_server.sh
+   ```
 
-# Run the setup script
-chmod +x prepare_for_claude.sh
-./prepare_for_claude.sh
-```
-
-### On Windows:
-```cmd
-# Clone the repository
-git clone https://github.com/infinitimeless/claude-lmstudio-bridge.git
-cd claude-lmstudio-bridge
-
-# Run the setup script
-prepare_for_claude.bat
-```
-
-The setup scripts will:
-1. Install the MCP package globally
-2. Set up a virtual environment with dependencies
-3. Make the wrapper scripts executable (on macOS/Linux)
-4. Show you exactly how to configure Claude Desktop
+### For Windows Users:
+1. Find your Python path by running `where python` in Command Prompt
+2. Edit `run_server.bat` and update the `PYTHON_PATH` variable with your path:
+   ```batch
+   :: Change to your actual Python path!
+   SET PYTHON_PATH=C:\Python311\python.exe
+   ```
 
 ## Features
 
@@ -39,7 +32,32 @@ The setup scripts will:
 - Generate text using local LLMs
 - Send chat completions to local LLMs
 
-## Configuration for Claude Desktop
+## Setup
+
+1. Clone this repository
+   ```bash
+   git clone https://github.com/infinitimeless/claude-lmstudio-bridge.git
+   cd claude-lmstudio-bridge
+   ```
+
+2. **Important:** Update the Python path in the wrapper script as described above
+
+3. Install the MCP package:
+   ```bash
+   # macOS/Linux
+   python3 -m pip install "mcp[cli]" httpx
+   
+   # Windows
+   python -m pip install "mcp[cli]" httpx
+   ```
+
+4. Start LM Studio and ensure the API server is running (in Settings > API Server)
+
+5. Configure Claude Desktop to use this MCP server (see Configuration section below)
+
+## Configuration
+
+Add this server to your Claude Desktop configuration:
 
 ### For macOS/Linux:
 
@@ -80,42 +98,34 @@ After configuring Claude Desktop, you can use commands like:
 - "Generate text about [topic] using my local LLM"
 - "Send this chat to my local LLM: [messages]"
 
-## Auto-starting with Claude Desktop
-
-For the bridge to start automatically with Claude Desktop:
-
-1. Make sure you've run the `prepare_for_claude.sh` (macOS/Linux) or `prepare_for_claude.bat` (Windows) script first
-2. Configure Claude Desktop as shown in the Configuration section
-3. Ensure LM Studio is running with its API server enabled when you start Claude Desktop
-4. Restart Claude Desktop to apply the changes
-
 ## Troubleshooting
 
 ### Common Errors
 
-**"ModuleNotFoundError: No module named 'mcp'"**
+**"Python not found" or Script Errors**
 
-If you see this error in the Claude Desktop logs:
+The most common issue is an incorrect Python path in the wrapper scripts. To fix this:
 
-1. Run the setup script again:
-   ```bash
-   # macOS/Linux
-   ./prepare_for_claude.sh
-   
-   # Windows
-   prepare_for_claude.bat
-   ```
+1. Open a terminal or command prompt
+2. Run `which python3` (macOS/Linux) or `where python` (Windows)
+3. Copy the full path to your Python executable 
+4. Update the `PYTHON_PATH` variable in `run_server.sh` or `run_server.bat`
+5. Make the script executable: `chmod +x run_server.sh` (macOS/Linux only)
+6. Restart Claude Desktop
 
-2. Make sure you're using the wrapper scripts:
-   - `run_server.sh` on macOS/Linux
-   - `run_server.bat` on Windows
+**"No module named 'mcp'"**
 
-**"pip: command not found"**
+If you see this error, you need to install the MCP package in the same Python environment:
 
-This occurs when the Python environment doesn't have pip in its PATH. The updated wrapper scripts use `python -m pip` instead, which should resolve this issue.
+```bash
+# Use your Python path from the wrapper script
+/path/to/your/python -m pip install "mcp[cli]" httpx
+```
+
+**Connection Issues with LM Studio**
+
+- Make sure LM Studio is running
+- Ensure the API server is enabled (in Settings > API Server)
+- Default API server address is http://localhost:1234
 
 For more troubleshooting steps, see [INSTALLATION.md](INSTALLATION.md).
-
-## Manual Installation and Advanced Configuration
-
-For advanced users or custom setups, see [INSTALLATION.md](INSTALLATION.md) for manual installation steps and detailed configuration options.
