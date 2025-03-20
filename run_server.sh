@@ -1,17 +1,26 @@
 #!/bin/bash
 
+# Configuration - CHANGE THESE TO MATCH YOUR SYSTEM
+# Find your Python path with "which python3" in terminal
+PYTHON_PATH="/usr/local/bin/python3"  # Change this to your actual Python path!
+
 # Print current environment details
 echo "Current directory: $(pwd)" >&2
+echo "Using Python at: $PYTHON_PATH" >&2
 
-# Find Python executable with absolute path
-PYTHON_PATH=$(which python3 2>/dev/null || which python 2>/dev/null || echo "/usr/bin/python3")
-echo "Using Python: $PYTHON_PATH" >&2
+# Check if Python exists at the specified path
+if [ ! -f "$PYTHON_PATH" ]; then
+  echo "ERROR: Python not found at $PYTHON_PATH" >&2
+  echo "Please edit run_server.sh and set PYTHON_PATH to the correct location of your Python installation" >&2
+  echo "You can find this by running 'which python3' in a terminal" >&2
+  exit 1
+fi
 
 # Check if mcp is installed, if not, try to install it
 if ! $PYTHON_PATH -c "import mcp" 2>/dev/null; then
   echo "MCP package not found, attempting to install..." >&2
   
-  # Try to install using python -m pip instead of direct pip call
+  # Try to install using python -m pip
   $PYTHON_PATH -m pip install "mcp[cli]" httpx || {
     echo "Failed to install MCP package. Please install manually with:" >&2
     echo "$PYTHON_PATH -m pip install \"mcp[cli]\"" >&2
