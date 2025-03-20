@@ -1,23 +1,37 @@
 # Claude-LMStudio Bridge
 
-An MCP server that bridges Claude with local LLMs running in LM Studio.
+An MCP server that bridges Claude with local LLMs running in LM Studio. This bridge allows Claude to interact with your local language models.
 
-## ⚠️ Important Update for Setup
+## 🚀 Quick Setup
 
-If you're getting a "No module named 'mcp'" error, there are two ways to fix it:
+For the **easiest setup** that ensures the bridge works with Claude Desktop:
 
-**Option 1: Use the wrapper scripts (Recommended)**
-- On macOS/Linux: Use `run_server.sh` instead of `server.py` in your Claude Desktop config
-- On Windows: Use `run_server.bat` instead of `server.py` in your Claude Desktop config
+### On macOS/Linux:
+```bash
+# Clone the repository
+git clone https://github.com/infinitimeless/claude-lmstudio-bridge.git
+cd claude-lmstudio-bridge
 
-These wrapper scripts will:
-- Activate the virtual environment if it exists
-- Attempt to install the MCP package if it's missing
-- Run the server with the correct Python environment
+# Run the setup script
+chmod +x prepare_for_claude.sh
+./prepare_for_claude.sh
+```
 
-**Option 2: Install MCP globally**
-- Run `pip install "mcp[cli]" httpx` in your system Python (not in a virtual environment)
-- This ensures the MCP package is available to Claude Desktop
+### On Windows:
+```cmd
+# Clone the repository
+git clone https://github.com/infinitimeless/claude-lmstudio-bridge.git
+cd claude-lmstudio-bridge
+
+# Run the setup script
+prepare_for_claude.bat
+```
+
+The setup scripts will:
+1. Install the MCP package globally
+2. Set up a virtual environment with dependencies
+3. Make the wrapper scripts executable (on macOS/Linux)
+4. Show you exactly how to configure Claude Desktop
 
 ## Features
 
@@ -25,26 +39,7 @@ These wrapper scripts will:
 - Generate text using local LLMs
 - Send chat completions to local LLMs
 
-## Setup
-
-1. Clone this repository
-   ```bash
-   git clone https://github.com/infinitimeless/claude-lmstudio-bridge.git
-   cd claude-lmstudio-bridge
-   ```
-
-2. Make the wrapper script executable (macOS/Linux only):
-   ```bash
-   chmod +x run_server.sh
-   ```
-
-3. Start LM Studio and ensure the API server is running (in Settings > API Server)
-
-4. Configure Claude Desktop to use this MCP server (see Configuration section below)
-
-## Configuration
-
-Add this server to your Claude Desktop configuration:
+## Configuration for Claude Desktop
 
 ### For macOS/Linux:
 
@@ -85,45 +80,42 @@ After configuring Claude Desktop, you can use commands like:
 - "Generate text about [topic] using my local LLM"
 - "Send this chat to my local LLM: [messages]"
 
+## Auto-starting with Claude Desktop
+
+For the bridge to start automatically with Claude Desktop:
+
+1. Make sure you've run the `prepare_for_claude.sh` (macOS/Linux) or `prepare_for_claude.bat` (Windows) script first
+2. Configure Claude Desktop as shown in the Configuration section
+3. Ensure LM Studio is running with its API server enabled when you start Claude Desktop
+4. Restart Claude Desktop to apply the changes
+
 ## Troubleshooting
 
 ### Common Errors
 
 **"ModuleNotFoundError: No module named 'mcp'"**
 
-This error means that the MCP package isn't installed in the Python environment that Claude Desktop is using to run the server.
+If you see this error in the Claude Desktop logs:
 
-Solutions:
-1. Use the wrapper scripts as described above
-2. Install MCP globally on your system with `pip install "mcp[cli]"`
-3. Set up a virtual environment, install dependencies, and make sure Claude Desktop is configured to use that environment's Python
+1. Run the setup script again:
+   ```bash
+   # macOS/Linux
+   ./prepare_for_claude.sh
+   
+   # Windows
+   prepare_for_claude.bat
+   ```
 
-**Error: "No module named 'httpx'"**
+2. Make sure you're using the wrapper scripts:
+   - `run_server.sh` on macOS/Linux
+   - `run_server.bat` on Windows
 
-Run:
-```bash
-pip install httpx
-```
+**"pip: command not found"**
+
+This occurs when the Python environment doesn't have pip in its PATH. The updated wrapper scripts use `python -m pip` instead, which should resolve this issue.
 
 For more troubleshooting steps, see [INSTALLATION.md](INSTALLATION.md).
 
-### Additional Troubleshooting
+## Manual Installation and Advanced Configuration
 
-If you encounter other issues with the server:
-
-1. **Check LM Studio**:
-   - Make sure LM Studio is running
-   - Ensure the API server is enabled (in Settings > API Server)
-   - Default API server address is http://localhost:1234
-
-2. **Test the Server Manually**:
-   ```bash
-   # Test if MCP is installed
-   python -c "import mcp; print(mcp.__version__)"
-   
-   # Run the wrapper script directly
-   ./run_server.sh  # macOS/Linux
-   run_server.bat   # Windows
-   ```
-
-3. **Check the Claude Desktop logs** for detailed error messages
+For advanced users or custom setups, see [INSTALLATION.md](INSTALLATION.md) for manual installation steps and detailed configuration options.
