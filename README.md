@@ -2,11 +2,48 @@
 
 An MCP server that bridges Claude with local LLMs running in LM Studio.
 
-## ⚠️ Important Setup Step Required
+## Easy Installation
 
-Before using this bridge, you **must** configure the Python path in the wrapper scripts:
+### Option 1: Automated Installation (Recommended)
 
-### For macOS/Linux Users:
+Run the installation script for your platform:
+
+#### For macOS/Linux:
+```bash
+# Clone the repository
+git clone https://github.com/infinitimeless/claude-lmstudio-bridge.git
+cd claude-lmstudio-bridge
+
+# Make the installer executable and run it
+chmod +x install.sh
+./install.sh
+```
+
+#### For Windows:
+```bash
+# Clone the repository
+git clone https://github.com/infinitimeless/claude-lmstudio-bridge.git
+cd claude-lmstudio-bridge
+
+# Run the installer
+install.bat
+```
+
+The installation script will:
+1. Find your Python installation automatically
+2. Configure the wrapper scripts with the correct Python path
+3. Install the required Python packages
+4. Update your Claude Desktop configuration file
+
+After installation, restart Claude Desktop to use the bridge.
+
+### Option 2: Manual Installation
+
+If the automated installation doesn't work, you can configure the bridge manually:
+
+#### 1. Update Python Path in Wrapper Scripts
+
+##### For macOS/Linux:
 1. Find your Python path by running `which python3` in Terminal
 2. Edit `run_server.sh` and update the `PYTHON_PATH` variable with your path:
    ```bash
@@ -18,7 +55,7 @@ Before using this bridge, you **must** configure the Python path in the wrapper 
    chmod +x run_server.sh
    ```
 
-### For Windows Users:
+##### For Windows:
 1. Find your Python path by running `where python` in Command Prompt
 2. Edit `run_server.bat` and update the `PYTHON_PATH` variable with your path:
    ```batch
@@ -26,41 +63,23 @@ Before using this bridge, you **must** configure the Python path in the wrapper 
    SET PYTHON_PATH=C:\Python311\python.exe
    ```
 
-## Features
+#### 2. Install Required Packages
 
-- List available LLM models in LM Studio
-- Generate text using local LLMs
-- Send chat completions to local LLMs
+Use your Python path to install the required packages:
 
-## Setup
+```bash
+# macOS/Linux
+/path/to/your/python -m pip install "mcp[cli]" httpx
 
-1. Clone this repository
-   ```bash
-   git clone https://github.com/infinitimeless/claude-lmstudio-bridge.git
-   cd claude-lmstudio-bridge
-   ```
+# Windows
+C:\path\to\your\python.exe -m pip install "mcp[cli]" httpx
+```
 
-2. **Important:** Update the Python path in the wrapper script as described above
-
-3. Install the MCP package:
-   ```bash
-   # macOS/Linux
-   python3 -m pip install "mcp[cli]" httpx
-   
-   # Windows
-   python -m pip install "mcp[cli]" httpx
-   ```
-
-4. Start LM Studio and ensure the API server is running (in Settings > API Server)
-
-5. Configure Claude Desktop to use this MCP server (see Configuration section below)
-
-## Configuration
+#### 3. Configure Claude Desktop
 
 Add this server to your Claude Desktop configuration:
 
-### For macOS/Linux:
-
+##### For macOS/Linux:
 ```json
 {
   "mcpServers": {
@@ -74,8 +93,7 @@ Add this server to your Claude Desktop configuration:
 }
 ```
 
-### For Windows:
-
+##### For Windows:
 ```json
 {
   "mcpServers": {
@@ -89,6 +107,12 @@ Add this server to your Claude Desktop configuration:
   }
 }
 ```
+
+## Features
+
+- List available LLM models in LM Studio
+- Generate text using local LLMs
+- Send chat completions to local LLMs
 
 ## Usage
 
