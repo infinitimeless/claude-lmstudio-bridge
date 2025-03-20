@@ -2,6 +2,23 @@
 
 An MCP server that bridges Claude with local LLMs running in LM Studio.
 
+## ⚠️ Important Update for Setup
+
+If you're getting a "No module named 'mcp'" error, there are two ways to fix it:
+
+**Option 1: Use the wrapper scripts (Recommended)**
+- On macOS/Linux: Use `run_server.sh` instead of `server.py` in your Claude Desktop config
+- On Windows: Use `run_server.bat` instead of `server.py` in your Claude Desktop config
+
+These wrapper scripts will:
+- Activate the virtual environment if it exists
+- Attempt to install the MCP package if it's missing
+- Run the server with the correct Python environment
+
+**Option 2: Install MCP globally**
+- Run `pip install "mcp[cli]" httpx` in your system Python (not in a virtual environment)
+- This ensures the MCP package is available to Claude Desktop
+
 ## Features
 
 - List available LLM models in LM Studio
@@ -16,73 +33,44 @@ An MCP server that bridges Claude with local LLMs running in LM Studio.
    cd claude-lmstudio-bridge
    ```
 
-2. Create a virtual environment:
+2. Make the wrapper script executable (macOS/Linux only):
    ```bash
-   python -m venv venv
+   chmod +x run_server.sh
    ```
 
-3. Activate the environment:
-   ```bash
-   source venv/bin/activate  # On macOS/Linux
-   venv\Scripts\activate     # On Windows
-   ```
+3. Start LM Studio and ensure the API server is running (in Settings > API Server)
 
-4. **Install MCP and other dependencies:**
-   ```bash
-   # Using uv (recommended)
-   pip install uv
-   uv add "mcp[cli]" httpx
-
-   # OR using pip
-   pip install "mcp[cli]" httpx
-   ```
-
-5. Verify MCP installation:
-   ```bash
-   python -c "import mcp; print(mcp.__version__)"
-   ```
-
-6. Test the MCP package installation:
-   ```bash
-   python test_mcp.py
-   ```
-
-7. Start LM Studio and ensure the API server is running (usually on port 1234)
-
-8. Configure Claude Desktop to use this MCP server
-
-For detailed installation instructions, see [INSTALLATION.md](INSTALLATION.md).
-
-## Testing
-
-Before configuring Claude to use the server, you can test it:
-
-1. First, test if the MCP package is working:
-   ```bash
-   python test_mcp.py
-   ```
-
-2. Then try the debug server:
-   ```bash
-   python debug_server.py
-   ```
-   
-3. If the debug server works, try the full server:
-   ```bash
-   python server.py
-   ```
+4. Configure Claude Desktop to use this MCP server (see Configuration section below)
 
 ## Configuration
 
 Add this server to your Claude Desktop configuration:
 
+### For macOS/Linux:
+
 ```json
 {
   "mcpServers": {
     "lmstudio-bridge": {
-      "command": "python",
+      "command": "/bin/bash",
       "args": [
-        "/absolute/path/to/server.py"
+        "/absolute/path/to/claude-lmstudio-bridge/run_server.sh"
+      ]
+    }
+  }
+}
+```
+
+### For Windows:
+
+```json
+{
+  "mcpServers": {
+    "lmstudio-bridge": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "C:\\absolute\\path\\to\\claude-lmstudio-bridge\\run_server.bat"
       ]
     }
   }
@@ -103,14 +91,18 @@ After configuring Claude Desktop, you can use commands like:
 
 **"ModuleNotFoundError: No module named 'mcp'"**
 
-This is the most common error and indicates that the MCP package isn't installed in your current Python environment. To fix this:
+This error means that the MCP package isn't installed in the Python environment that Claude Desktop is using to run the server.
 
+Solutions:
+1. Use the wrapper scripts as described above
+2. Install MCP globally on your system with `pip install "mcp[cli]"`
+3. Set up a virtual environment, install dependencies, and make sure Claude Desktop is configured to use that environment's Python
+
+**Error: "No module named 'httpx'"**
+
+Run:
 ```bash
-# Make sure you're in the right virtual environment
-source venv/bin/activate  # On macOS/Linux
-
-# Install the MCP SDK
-pip install "mcp[cli]"
+pip install httpx
 ```
 
 For more troubleshooting steps, see [INSTALLATION.md](INSTALLATION.md).
@@ -119,30 +111,19 @@ For more troubleshooting steps, see [INSTALLATION.md](INSTALLATION.md).
 
 If you encounter other issues with the server:
 
-1. **Check Dependencies**:
-   ```bash
-   pip list | grep mcp
-   pip list | grep httpx
-   ```
-
-2. **Check LM Studio**:
+1. **Check LM Studio**:
    - Make sure LM Studio is running
    - Ensure the API server is enabled (in Settings > API Server)
-   - Verify the API is accessible at http://localhost:1234/v1/models
+   - Default API server address is http://localhost:1234
 
-3. **Test Incrementally**:
-   - Run `test_mcp.py` to verify MCP installation
-   - Run `debug_server.py` to test minimal MCP server functionality
-   - Then try the full `server.py`
+2. **Test the Server Manually**:
+   ```bash
+   # Test if MCP is installed
+   python -c "import mcp; print(mcp.__version__)"
+   
+   # Run the wrapper script directly
+   ./run_server.sh  # macOS/Linux
+   run_server.bat   # Windows
+   ```
 
-4. **Error Logs**:
-   - Check the Claude Desktop logs for any errors
-   - The server outputs diagnostic information to stderr that should appear in the logs
-
-5. **Python Version**:
-   - Make sure you're using Python 3.8 or newer
-   - Check your Python version with `python --version`
-
-6. **Path Issues**:
-   - Make sure the path to server.py in your Claude Desktop config is absolute
-   - Example: `/Users/username/projects/claude-lmstudio-bridge/server.py`
+3. **Check the Claude Desktop logs** for detailed error messages
