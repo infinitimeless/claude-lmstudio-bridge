@@ -27,19 +27,31 @@ An MCP server that bridges Claude with local LLMs running in LM Studio.
    venv\Scripts\activate     # On Windows
    ```
 
-4. Install dependencies:
+4. **Install MCP and other dependencies:**
    ```bash
-   pip install -r requirements.txt
+   # Using uv (recommended)
+   pip install uv
+   uv add "mcp[cli]" httpx
+
+   # OR using pip
+   pip install "mcp[cli]" httpx
    ```
 
-5. Test the MCP package installation:
+5. Verify MCP installation:
+   ```bash
+   python -c "import mcp; print(mcp.__version__)"
+   ```
+
+6. Test the MCP package installation:
    ```bash
    python test_mcp.py
    ```
 
-6. Start LM Studio and ensure the API server is running (usually on port 1234)
+7. Start LM Studio and ensure the API server is running (usually on port 1234)
 
-7. Configure Claude Desktop to use this MCP server
+8. Configure Claude Desktop to use this MCP server
+
+For detailed installation instructions, see [INSTALLATION.md](INSTALLATION.md).
 
 ## Testing
 
@@ -87,17 +99,30 @@ After configuring Claude Desktop, you can use commands like:
 
 ## Troubleshooting
 
-If you encounter issues with the server:
+### Common Errors
+
+**"ModuleNotFoundError: No module named 'mcp'"**
+
+This is the most common error and indicates that the MCP package isn't installed in your current Python environment. To fix this:
+
+```bash
+# Make sure you're in the right virtual environment
+source venv/bin/activate  # On macOS/Linux
+
+# Install the MCP SDK
+pip install "mcp[cli]"
+```
+
+For more troubleshooting steps, see [INSTALLATION.md](INSTALLATION.md).
+
+### Additional Troubleshooting
+
+If you encounter other issues with the server:
 
 1. **Check Dependencies**:
    ```bash
    pip list | grep mcp
    pip list | grep httpx
-   ```
-   
-   If they're missing, reinstall:
-   ```bash
-   pip install "mcp[cli]" httpx
    ```
 
 2. **Check LM Studio**:
