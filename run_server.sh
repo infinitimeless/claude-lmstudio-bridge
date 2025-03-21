@@ -1,8 +1,13 @@
 #!/bin/bash
 
-# Configuration - CHANGE THESE TO MATCH YOUR SYSTEM
-# Find your Python path with "which python3" in terminal
-PYTHON_PATH="/usr/local/bin/python3"  # Change this to your actual Python path!
+# Configuration - Auto-detect Python path
+if [ -z "$PYTHON_PATH" ]; then
+  PYTHON_PATH=$(which python3 2>/dev/null || which python 2>/dev/null)
+  if [ -z "$PYTHON_PATH" ]; then
+    echo "ERROR: Python not found. Please install Python 3." >&2
+    exit 1
+  fi
+fi
 
 # Print current environment details
 echo "Current directory: $(pwd)" >&2
@@ -11,8 +16,7 @@ echo "Using Python at: $PYTHON_PATH" >&2
 # Check if Python exists at the specified path
 if [ ! -f "$PYTHON_PATH" ]; then
   echo "ERROR: Python not found at $PYTHON_PATH" >&2
-  echo "Please edit run_server.sh and set PYTHON_PATH to the correct location of your Python installation" >&2
-  echo "You can find this by running 'which python3' in a terminal" >&2
+  echo "Please install Python or set the correct path in this script." >&2
   exit 1
 fi
 
@@ -23,14 +27,7 @@ if ! $PYTHON_PATH -c "import mcp" 2>/dev/null; then
   # Try to install using python -m pip
   $PYTHON_PATH -m pip install "mcp[cli]" httpx || {
     echo "Failed to install MCP package. Please install manually with:" >&2
-    echo "$PYTHON_PATH -m pip install \"mcp[cli]\"" >&2
-    
-    # Additional guidance for Claude Desktop startup integration
-    echo "" >&2
-    echo "For Claude Desktop Startup Integration:" >&2
-    echo "1. Open Terminal and navigate to this directory" >&2
-    echo "2. Run: $PYTHON_PATH -m pip install \"mcp[cli]\" httpx" >&2
-    echo "3. Make sure this script is executable: chmod +x run_server.sh" >&2
+    echo "$PYTHON_PATH -m pip install \"mcp[cli]\" httpx" >&2
     exit 1
   }
   
@@ -39,6 +36,41 @@ if ! $PYTHON_PATH -c "import mcp" 2>/dev/null; then
     echo "MCP package was installed but still can't be imported." >&2
     echo "This might be due to a Python path issue." >&2
     exit 1
+  fi
+fi
+
+# Check if httpx is installed
+if ! $PYTHON_PATH -c "import httpx" 2>/dev/null; then
+  echo "httpx package not found, attempting to install..." >&2
+  $PYTHON_PATH -m pip install httpx || {
+    echo "Failed to install httpx package." >&2
+    exit 1
+  }
+fi
+
+# Check if dotenv is installed (for .env file support)
+if ! $PYTHON_PATH -c "import dotenv" 2>/dev/null; then
+  echo "python-dotenv package not found, attempting to install..." >&2
+  $PYTHON_PATH -m pip install python-dotenv || {
+    echo "Failed to install python-dotenv package." >&2
+    exit 1
+  }
+fi
+
+# Check if virtual environment exists and use it if it does
+if [ -d "venv" ] && [ -f "venv/bin/python" ]; then
+  echo "Using Python from virtual environment" >&2
+  PYTHON_PATH=$(pwd)/venv/bin/python
+  echo "Updated Python path to: $PYTHON_PATH" >&2
+fi
+
+# Attempt to check if LM Studio is running before starting
+if command -v nc &> /dev/null; then
+  if ! nc -z localhost 1234 2>/dev/null; then
+    echo "WARNING: LM Studio does not appear to be running on port 1234" >&2
+    echo "Please make sure LM Studio is running with the API server enabled" >&2
+  else
+    echo "✓ LM Studio API server appears to be running on port 1234" >&2
   fi
 fi
 
