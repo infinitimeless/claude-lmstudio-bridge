@@ -1,6 +1,7 @@
 # Core dependencies
 mcp[cli]>=0.1.0
 httpx>=0.24.0
+python-dotenv>=1.0.0
 
-# For running tests
+# For development and testing
 pytest>=7.0.0
